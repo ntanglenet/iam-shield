@@ -1,0 +1,4 @@
+org.iamshield.protocol.oidc.tokenexchange.V1TokenExchangeProviderFactory
+org.iamshield.protocol.oidc.tokenexchange.StandardTokenExchangeProviderFactory
+org.iamshield.protocol.oidc.tokenexchange.ExternalToInternalTokenExchangeProviderFactory
+

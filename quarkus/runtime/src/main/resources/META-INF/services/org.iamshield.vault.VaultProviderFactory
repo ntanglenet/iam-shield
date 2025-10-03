@@ -1,0 +1,3 @@
+org.iamshield.quarkus.runtime.vault.FilesPlainTextVaultProviderFactory
+org.iamshield.quarkus.runtime.vault.FilesKeystoreVaultProviderFactory
+

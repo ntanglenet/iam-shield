@@ -1,0 +1,10 @@
+org.iamshield.testsuite.federation.BackwardsCompatibilityUserStorageFactory
+org.iamshield.testsuite.federation.DummyUserFederationProviderFactory
+org.iamshield.testsuite.federation.FailableHardcodedStorageProviderFactory
+org.iamshield.testsuite.federation.UserMapStorageFactory
+org.iamshield.testsuite.federation.UserPropertyFileStorageFactory
+org.iamshield.testsuite.federation.PassThroughFederatedUserStorageProviderFactory
+org.iamshield.testsuite.federation.sync.SyncDummyUserFederationProviderFactory
+org.iamshield.testsuite.federation.sync.IgnoredDummyUserFederationProviderFactory
+org.iamshield.testsuite.federation.FailingUserStorageProviderFactory
+

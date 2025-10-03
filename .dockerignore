@@ -1,0 +1,36 @@
+# VCS
+.git
+.gitignore
+
+# IDE / OS
+.idea
+.vscode
+*.iml
+*.log
+target/
+**/target/
+**/.DS_Store
+
+# Node artifacts (js workspace is large; we don't need node_modules for building Java)
+node_modules/
+**/node_modules/
+js/**/.pnpm-store
+js/**/dist
+js/**/.next
+js/**/.turbo
+
+# Build outputs and caches
+# Keep Maven wrapper directory in context; ignore only cache-like dirs
+.mvn/.gradle
+**/.mvn/.gradle
+**/.gradle
+**/.cache
+**/.classpath
+**/.project
+**/.settings
+
+# Local env files
+.env
+**/.env*
+
+

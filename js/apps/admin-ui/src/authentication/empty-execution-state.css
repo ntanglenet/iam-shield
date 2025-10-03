@@ -1,0 +1,11 @@
+.iamshield__empty-execution-state__block {
+  padding-top: var(--pf-v5-global--spacer--sm);
+}
+.iamshield__empty-execution-state__help {
+  max-width: 36rem;
+  margin: 0 auto var(--pf-v5-global--spacer--2xl);
+}
+
+.iamshield__empty-execution-state__help p {
+  color: var(--pf-v5-global--Color--200);
+}

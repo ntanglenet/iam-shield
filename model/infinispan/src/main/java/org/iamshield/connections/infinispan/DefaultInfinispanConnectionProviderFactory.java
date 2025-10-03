@@ -1,0 +1,333 @@
+/*
+ * Copyright 2016 Red Hat, Inc. and/or its affiliates
+ * and other contributors as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.iamshield.connections.infinispan;
+
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
+
+import org.infinispan.client.hotrod.RemoteCacheManager;
+import org.infinispan.commons.configuration.io.ConfigurationWriter;
+import org.infinispan.commons.io.StringBuilderWriter;
+import org.infinispan.commons.util.Version;
+import org.infinispan.configuration.cache.Configuration;
+import org.infinispan.factories.GlobalComponentRegistry;
+import org.infinispan.configuration.parsing.ParserRegistry;
+import org.infinispan.health.CacheHealth;
+import org.infinispan.manager.DefaultCacheManager;
+import org.infinispan.manager.EmbeddedCacheManager;
+import org.jboss.logging.Logger;
+import org.iamshield.Config;
+import org.iamshield.cluster.ClusterEvent;
+import org.iamshield.cluster.ClusterProvider;
+import org.iamshield.config.CachingOptions;
+import org.iamshield.connections.infinispan.remote.RemoteInfinispanConnectionProvider;
+import org.iamshield.infinispan.health.ClusterHealth;
+import org.iamshield.infinispan.util.InfinispanUtils;
+import org.iamshield.marshalling.IAMShieldIndexSchemaUtil;
+import org.iamshield.marshalling.IAMShieldModelSchema;
+import org.iamshield.models.IAMShieldSession;
+import org.iamshield.models.IAMShieldSessionFactory;
+import org.iamshield.models.cache.infinispan.ClearCacheEvent;
+import org.iamshield.models.cache.infinispan.events.RealmRemovedEvent;
+import org.iamshield.models.cache.infinispan.events.RealmUpdatedEvent;
+import org.iamshield.models.sessions.infinispan.query.ClientSessionQueries;
+import org.iamshield.models.sessions.infinispan.query.UserSessionQueries;
+import org.iamshield.models.sessions.infinispan.remote.RemoteInfinispanAuthenticationSessionProviderFactory;
+import org.iamshield.models.sessions.infinispan.remote.RemoteUserLoginFailureProviderFactory;
+import org.iamshield.models.utils.IAMShieldModelUtils;
+import org.iamshield.models.utils.PostMigrationEvent;
+import org.iamshield.provider.InvalidationHandler.ObjectType;
+import org.iamshield.provider.Provider;
+import org.iamshield.provider.ProviderEvent;
+import org.iamshield.provider.ProviderEventListener;
+import org.iamshield.provider.ServerInfoAwareProviderFactory;
+import org.iamshield.spi.infinispan.CacheEmbeddedConfigProvider;
+import org.iamshield.spi.infinispan.CacheRemoteConfigProvider;
+import org.iamshield.spi.infinispan.impl.embedded.CacheConfigurator;
+
+import static org.iamshield.connections.infinispan.InfinispanConnectionProvider.AUTHENTICATION_SESSIONS_CACHE_NAME;
+import static org.iamshield.connections.infinispan.InfinispanConnectionProvider.CLIENT_SESSION_CACHE_NAME;
+import static org.iamshield.connections.infinispan.InfinispanConnectionProvider.CLUSTERED_CACHE_NAMES;
+import static org.iamshield.connections.infinispan.InfinispanConnectionProvider.CRL_CACHE_NAME;
+import static org.iamshield.connections.infinispan.InfinispanConnectionProvider.KEYS_CACHE_NAME;
+import static org.iamshield.connections.infinispan.InfinispanConnectionProvider.LOGIN_FAILURE_CACHE_NAME;
+import static org.iamshield.connections.infinispan.InfinispanConnectionProvider.OFFLINE_CLIENT_SESSION_CACHE_NAME;
+import static org.iamshield.connections.infinispan.InfinispanConnectionProvider.OFFLINE_USER_SESSION_CACHE_NAME;
+import static org.iamshield.connections.infinispan.InfinispanConnectionProvider.USER_SESSION_CACHE_NAME;
+import static org.iamshield.connections.infinispan.InfinispanUtil.setTimeServiceToKeycloakTime;
+import static org.iamshield.models.cache.infinispan.InfinispanCacheRealmProviderFactory.REALM_CLEAR_CACHE_EVENTS;
+import static org.iamshield.models.cache.infinispan.InfinispanCacheRealmProviderFactory.REALM_INVALIDATION_EVENTS;
+
+/**
+ * @author <a href="mailto:sthorger@redhat.com">Stian Thorgersen</a>
+ */
+public class DefaultInfinispanConnectionProviderFactory implements InfinispanConnectionProviderFactory, ProviderEventListener, ServerInfoAwareProviderFactory {
+
+    private static final ReadWriteLock READ_WRITE_LOCK = new ReentrantReadWriteLock();
+    private static final Logger logger = Logger.getLogger(DefaultInfinispanConnectionProviderFactory.class);
+
+    private Config.Scope config;
+
+    private volatile EmbeddedCacheManager cacheManager;
+    private volatile RemoteCacheManager remoteCacheManager;
+    private volatile InfinispanConnectionProvider connectionProvider;
+    private volatile ClusterHealth clusterHealth;
+
+    @Override
+    public InfinispanConnectionProvider create(IAMShieldSession session) {
+        return lazyInit(session);
+    }
+
+    /*
+        Workaround for Infinispan 12.1.7.Final and tested until 14.0.19.Final to prevent a deadlock while
+        DefaultInfinispanConnectionProviderFactory is shutting down. Kept as a permanent solution and considered
+        good enough after a lot of analysis went into this difficult to reproduce problem.
+        See https://github.com/keycloak/keycloak/issues/9871 for the discussion.
+    */
+    public static void runWithReadLockOnCacheManager(Runnable task) {
+        Lock lock = DefaultInfinispanConnectionProviderFactory.READ_WRITE_LOCK.readLock();
+        lock.lock();
+        try {
+            task.run();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public static void runWithWriteLockOnCacheManager(Runnable task) {
+        Lock lock = DefaultInfinispanConnectionProviderFactory.READ_WRITE_LOCK.writeLock();
+        lock.lock();
+        try {
+            task.run();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void close() {
+        logger.debug("Closing provider");
+        runWithWriteLockOnCacheManager(() -> {
+            if (cacheManager != null) {
+                cacheManager.stop();
+                cacheManager = null;
+            }
+        });
+        if (remoteCacheManager != null) {
+            remoteCacheManager.close();
+            remoteCacheManager = null;
+        }
+    }
+
+    @Override
+    public String getId() {
+        return "default";
+    }
+
+    @Override
+    public void init(Config.Scope config) {
+        this.config = config;
+    }
+
+    @Override
+    public void postInit(IAMShieldSessionFactory factory) {
+        factory.register(this);
+    }
+
+    protected InfinispanConnectionProvider lazyInit(IAMShieldSession keycloakSession) {
+        if (connectionProvider != null) {
+            return connectionProvider;
+        }
+        synchronized (this) {
+            if (connectionProvider != null) {
+                return connectionProvider;
+            }
+
+            this.cacheManager = createEmbeddedCacheManager(keycloakSession);
+            injectKeycloakTimeService(cacheManager);
+            var topologyInfo = new TopologyInfo(cacheManager);
+            logger.infof(topologyInfo.toString());
+
+            this.remoteCacheManager = createRemoteCacheManager(keycloakSession);
+            this.connectionProvider = InfinispanUtils.isRemoteInfinispan() ?
+                    new RemoteInfinispanConnectionProvider(cacheManager, remoteCacheManager, topologyInfo) :
+                    new DefaultInfinispanConnectionProvider(cacheManager, topologyInfo);
+
+            clusterHealth = GlobalComponentRegistry.componentOf(cacheManager, ClusterHealth.class);
+            return connectionProvider;
+        }
+    }
+
+    protected EmbeddedCacheManager createEmbeddedCacheManager(IAMShieldSession session) {
+        var holder = session.getProvider(CacheEmbeddedConfigProvider.class).configuration();
+
+        StringBuilderWriter sw = new StringBuilderWriter();
+        ParserRegistry parser = new ParserRegistry();
+        try (ConfigurationWriter w = ConfigurationWriter.to(sw).prettyPrint(true).build()) {
+            var globalConfig = holder.getGlobalConfigurationBuilder().build();
+            var cacheConfigs = holder.getNamedConfigurationBuilders().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().build()));
+            parser.serialize(w, globalConfig, cacheConfigs);
+            logger.debugf("Infinispan configuration:\n%s", sw);
+        }
+
+        var cm = new DefaultCacheManager(holder, true);
+        cm.getCache(KEYS_CACHE_NAME, true);
+        cm.getCache(CRL_CACHE_NAME, true);
+
+        logger.debugv("Using container managed Infinispan cache container, lookup={0}", cm);
+        return cm;
+    }
+
+    protected RemoteCacheManager createRemoteCacheManager(IAMShieldSession session) {
+        var remoteConfig = session.getProvider(CacheRemoteConfigProvider.class).configuration();
+        if (remoteConfig.isEmpty()) {
+            logger.debug("Remote Cache feature is disabled");
+            return null;
+        }
+        logger.debug("Remote Cache feature is enabled");
+        var rcm = new RemoteCacheManager(remoteConfig.get());
+
+        // upload the schema before trying to access the caches
+        // not caching the list; it is only used during startup
+        var entities = List.of(
+                new IAMShieldIndexSchemaUtil.IndexedEntity(RemoteUserLoginFailureProviderFactory.PROTO_ENTITY, LOGIN_FAILURE_CACHE_NAME),
+                new IAMShieldIndexSchemaUtil.IndexedEntity(RemoteInfinispanAuthenticationSessionProviderFactory.PROTO_ENTITY, AUTHENTICATION_SESSIONS_CACHE_NAME),
+                new IAMShieldIndexSchemaUtil.IndexedEntity(ClientSessionQueries.CLIENT_SESSION, CLIENT_SESSION_CACHE_NAME),
+                new IAMShieldIndexSchemaUtil.IndexedEntity(ClientSessionQueries.CLIENT_SESSION, OFFLINE_CLIENT_SESSION_CACHE_NAME),
+                new IAMShieldIndexSchemaUtil.IndexedEntity(UserSessionQueries.USER_SESSION, USER_SESSION_CACHE_NAME),
+                new IAMShieldIndexSchemaUtil.IndexedEntity(UserSessionQueries.USER_SESSION, OFFLINE_USER_SESSION_CACHE_NAME)
+        );
+        IAMShieldIndexSchemaUtil.uploadAndReindexCaches(rcm, IAMShieldModelSchema.INSTANCE, entities);
+        return rcm;
+    }
+
+    /**
+     * @deprecated not invoked anymore. Overwrite {@link #createEmbeddedCacheManager(IAMShieldSession)}.
+     */
+    @Deprecated(since = "26.0", forRemoval = true)
+    protected EmbeddedCacheManager initContainerManaged(EmbeddedCacheManager cacheManager) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @deprecated not used anymore. Overwrite {@link #createEmbeddedCacheManager(IAMShieldSession)} if you want to
+     * create a custom {@link EmbeddedCacheManager}.
+     */
+    @Deprecated(since = "26.3", forRemoval = true)
+    protected EmbeddedCacheManager initEmbedded() {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * @deprecated not used anymore
+     */
+    @Deprecated(since = "26.3", forRemoval = true)
+    protected Configuration getKeysCacheConfig() {
+        return CacheConfigurator.getCacheConfiguration(KEYS_CACHE_NAME, true).build();
+    }
+
+    /**
+     * @deprecated Use {@link CacheConfigurator#getCrlCacheConfig()}
+     */
+    @Deprecated(since = "26.3", forRemoval = true)
+    protected Configuration getCrlCacheConfig() {
+        return CacheConfigurator.getCrlCacheConfig().build();
+    }
+
+    private void registerSystemWideListeners(IAMShieldSession session) {
+        IAMShieldSessionFactory sessionFactory = session.getIAMShieldSessionFactory();
+        ClusterProvider cluster = session.getProvider(ClusterProvider.class);
+        cluster.registerListener(REALM_CLEAR_CACHE_EVENTS, (ClusterEvent event) -> {
+            if (event instanceof ClearCacheEvent) {
+                sessionFactory.invalidate(null, ObjectType._ALL_);
+            }
+        });
+        cluster.registerListener(REALM_INVALIDATION_EVENTS, (ClusterEvent event) -> {
+            if (event instanceof RealmUpdatedEvent rr) {
+                sessionFactory.invalidate(null, ObjectType.REALM, rr.getId());
+            } else if (event instanceof RealmRemovedEvent rr) {
+                sessionFactory.invalidate(null, ObjectType.REALM, rr.getId());
+            }
+        });
+    }
+
+    private void injectKeycloakTimeService(EmbeddedCacheManager cacheManager) {
+        if (config.getBoolean("useKeycloakTimeService", Boolean.FALSE)) {
+            setTimeServiceToKeycloakTime(cacheManager);
+        }
+    }
+
+    @Override
+    public Set<Class<? extends Provider>> dependsOn() {
+        return Set.of(CacheRemoteConfigProvider.class, CacheEmbeddedConfigProvider.class);
+    }
+
+    @Override
+    public void onEvent(ProviderEvent event) {
+        if (event instanceof PostMigrationEvent pme) {
+            IAMShieldModelUtils.runJobInTransaction(pme.getFactory(), this::registerSystemWideListeners);
+        }
+    }
+
+    @Override
+    public Map<String, String> getOperationalInfo() {
+        Map<String, String> info = new LinkedHashMap<>();
+        info.put("product", Version.getBrandName());
+        info.put("version", Version.getBrandVersion());
+        if (InfinispanUtils.isRemoteInfinispan()) {
+            addRemoteOperationalInfo(info);
+        } else {
+            addEmbeddedOperationalInfo(info);
+        }
+        return info;
+    }
+
+    @Override
+    public boolean isClusterHealthy() {
+        clusterHealth.triggerClusterHealthCheck();
+        return clusterHealth.isHealthy();
+    }
+
+    @Override
+    public boolean isClusterHealthSupported() {
+        return clusterHealth.isSupported();
+    }
+
+    private void addEmbeddedOperationalInfo(Map<String, String> info) {
+        var cacheManagerInfo = cacheManager.getCacheManagerInfo();
+        info.put("clusterSize", Integer.toString(cacheManagerInfo.getClusterSize()));
+        var cacheNames = Arrays.stream(CLUSTERED_CACHE_NAMES)
+                .sorted()
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+        for (CacheHealth health : cacheManager.getHealth().getCacheHealth(cacheNames)) {
+            info.put(health.getCacheName() + ":Cache", health.getStatus().toString());
+        }
+    }
+
+    private void addRemoteOperationalInfo(Map<String, String> info) {
+        info.put("connectionCount", Integer.toString(remoteCacheManager.getConnectionCount()));
+    }
+}

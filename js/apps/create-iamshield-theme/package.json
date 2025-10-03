@@ -1,0 +1,23 @@
+{
+  "name": "create-iamshield-theme",
+  "version": "999.0.0-SNAPSHOT",
+  "description": "Create a new IAMShield ui project based on a template",
+  "main": "create.js",
+  "type": "module",
+  "scripts": {
+    "start": "node create.js"
+  },
+  "bin": {
+    "create-iamshield-theme": "./create.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "chalk": "^5.6.2",
+    "commander": "^14.0.1",
+    "fs-extra": "^11.3.2",
+    "mustache": "^4.2.0",
+    "simple-git": "^3.28.0"
+  }
+}

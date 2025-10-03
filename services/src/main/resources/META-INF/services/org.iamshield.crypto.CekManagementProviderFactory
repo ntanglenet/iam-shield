@@ -1,0 +1,7 @@
+org.iamshield.crypto.EcdhEsCekManagementProviderFactory
+org.iamshield.crypto.EcdhEsA128KwCekManagementProviderFactory
+org.iamshield.crypto.EcdhEsA192KwCekManagementProviderFactory
+org.iamshield.crypto.EcdhEsA256KwCekManagementProviderFactory
+org.iamshield.crypto.RsaesPkcs1CekManagementProviderFactory
+org.iamshield.crypto.RsaesOaepCekManagementProviderFactory
+org.iamshield.crypto.RsaesOaep256CekManagementProviderFactory

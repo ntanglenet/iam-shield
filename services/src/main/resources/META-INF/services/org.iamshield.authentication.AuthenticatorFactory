@@ -1,0 +1,61 @@
+#
+# Copyright 2016 Red Hat, Inc. and/or its affiliates
+# and other contributors as indicated by the @author tags.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+org.iamshield.authentication.authenticators.browser.CookieAuthenticatorFactory
+org.iamshield.authentication.authenticators.browser.UsernamePasswordFormFactory
+org.iamshield.authentication.authenticators.browser.UsernameFormFactory
+org.iamshield.authentication.authenticators.browser.PasswordFormFactory
+org.iamshield.authentication.authenticators.browser.OTPFormAuthenticatorFactory
+org.iamshield.authentication.authenticators.browser.SpnegoAuthenticatorFactory
+org.iamshield.authentication.authenticators.browser.IdentityProviderAuthenticatorFactory
+org.iamshield.authentication.authenticators.conditional.ConditionalSubFlowExecutedAuthenticatorFactory
+org.iamshield.authentication.authenticators.conditional.ConditionalClientScopeAuthenticatorFactory
+org.iamshield.authentication.authenticators.conditional.ConditionalRoleAuthenticatorFactory
+org.iamshield.authentication.authenticators.conditional.ConditionalUserConfiguredAuthenticatorFactory
+org.iamshield.authentication.authenticators.conditional.ConditionalLoaAuthenticatorFactory
+org.iamshield.authentication.authenticators.conditional.ConditionalUserAttributeValueFactory
+org.iamshield.authentication.authenticators.conditional.ConditionalCredentialAuthenticatorFactory
+org.iamshield.authentication.authenticators.directgrant.ValidateOTP
+org.iamshield.authentication.authenticators.directgrant.ValidatePassword
+org.iamshield.authentication.authenticators.directgrant.ValidateUsername
+org.iamshield.authentication.authenticators.resetcred.ResetCredentialChooseUser
+org.iamshield.authentication.authenticators.resetcred.ResetCredentialEmail
+org.iamshield.authentication.authenticators.resetcred.ResetOTP
+org.iamshield.authentication.authenticators.resetcred.ResetPassword
+org.iamshield.authentication.authenticators.broker.IdpReviewProfileAuthenticatorFactory
+org.iamshield.authentication.authenticators.broker.IdpCreateUserIfUniqueAuthenticatorFactory
+org.iamshield.authentication.authenticators.broker.IdpDetectExistingBrokerUserAuthenticatorFactory
+org.iamshield.authentication.authenticators.broker.IdpConfirmLinkAuthenticatorFactory
+org.iamshield.authentication.authenticators.broker.IdpConfirmOverrideLinkAuthenticatorFactory
+org.iamshield.authentication.authenticators.broker.IdpEmailVerificationAuthenticatorFactory
+org.iamshield.authentication.authenticators.broker.IdpUsernamePasswordFormFactory
+org.iamshield.authentication.authenticators.broker.IdpAutoLinkAuthenticatorFactory
+org.iamshield.organization.authentication.authenticators.broker.IdpOrganizationAuthenticatorFactory
+org.iamshield.authentication.authenticators.browser.ConditionalOtpFormAuthenticatorFactory
+org.iamshield.protocol.saml.profile.ecp.authenticator.HttpBasicAuthenticatorFactory
+org.iamshield.authentication.authenticators.x509.X509ClientCertificateAuthenticatorFactory
+org.iamshield.authentication.authenticators.x509.ValidateX509CertificateUsernameFactory
+org.iamshield.protocol.docker.DockerAuthenticatorFactory
+org.iamshield.authentication.authenticators.browser.WebAuthnAuthenticatorFactory
+org.iamshield.authentication.authenticators.browser.WebAuthnPasswordlessAuthenticatorFactory
+org.iamshield.authentication.authenticators.access.DenyAccessAuthenticatorFactory
+org.iamshield.authentication.authenticators.access.AllowAccessAuthenticatorFactory
+org.iamshield.authentication.authenticators.sessionlimits.UserSessionLimitsAuthenticatorFactory
+org.iamshield.authentication.authenticators.browser.RecoveryAuthnCodesFormAuthenticatorFactory
+org.iamshield.organization.authentication.authenticators.browser.OrganizationAuthenticatorFactory
+org.iamshield.authentication.authenticators.browser.PasskeysConditionalUIAuthenticatorFactory
+

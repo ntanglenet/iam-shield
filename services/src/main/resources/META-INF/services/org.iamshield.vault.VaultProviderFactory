@@ -1,0 +1,2 @@
+org.iamshield.vault.FilesPlainTextVaultProviderFactory
+org.iamshield.vault.FilesKeystoreVaultProviderFactory

@@ -1,0 +1,12 @@
+.iamshield__dashboard_icon {
+  max-width: 114px;
+}
+
+.iamshield__dashboard_card {
+  height: 100%;
+}
+
+.iamshield__dashboard_welcome_tab {
+  max-width: 38%;
+  margin-top: var(--pf-v5-global--spacer--md);
+}
