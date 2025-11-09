@@ -27,6 +27,7 @@
     <baseDirectory>${dist.archive.dir}</baseDirectory>
 
     <fileSets>
+<<<<<<< HEAD
         <fileSet>
             <directory>target/${project.build.finalName}</directory>
             <outputDirectory/>
@@ -116,3 +117,44 @@
     </files>
 
 </assembly>
+=======
+        <!-- COPY ENTIRE QUARKUS SERVER TARGET DIRECTORY -->
+        <fileSet>
+            <directory>../server/target</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <excludes>
+                <exclude>**/bin/**</exclude>
+                <exclude>**/test/**</exclude>
+                <exclude>**/surefire/**</exclude>
+                <exclude>**/classes/**</exclude>
+                <exclude>**/test-classes/**</exclude>
+                <exclude>**/generated-test-sources/**</exclude>
+                <exclude>**/maven-status/**</exclude>
+            </excludes>
+        </fileSet>
+        
+        <!-- WHITE-LABELED BIN SCRIPTS (OVERWRITE QUARKUS BIN) -->
+        <fileSet>
+            <directory>src/main/content/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+        
+        <!-- CLIENT TOOLS BIN -->
+        <fileSet>
+            <directory>target/iamshield-client-tools/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+    </fileSets>
+</assembly>
+>>>>>>> master

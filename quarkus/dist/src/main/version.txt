@@ -1,1 +1,5 @@
+<<<<<<< HEAD
 IAMShield - Version ${project.version}
+=======
+IAMShield 999.0.0-SNAPSHOT
+>>>>>>> master

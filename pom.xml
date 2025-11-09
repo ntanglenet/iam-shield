@@ -1508,7 +1508,11 @@
     </build>
 
     <profiles>
+<<<<<<< HEAD
         <profile>
+=======
+       <!-- <profile>
+>>>>>>> master
             <id>testsuite</id>
             <activation>
                 <property>
@@ -1518,7 +1522,11 @@
             <modules>
                 <module>testsuite</module>
             </modules>
+<<<<<<< HEAD
         </profile>
+=======
+        </profile> -->
+>>>>>>> master
         <profile>
             <id>adapters</id>
             <activation>
@@ -1720,5 +1728,9 @@
                 <iamshield.crypto.artifactId>iamshield-crypto-fips1402</iamshield.crypto.artifactId>
             </properties>
         </profile>
+<<<<<<< HEAD
+=======
+        
+>>>>>>> master
     </profiles>
 </project>

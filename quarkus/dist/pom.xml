@@ -30,6 +30,7 @@
     <description>IAMShield Quarkus Server Distribution</description>
 
     <dependencies>
+<<<<<<< HEAD
         <dependency>
             <groupId>org.iamshield</groupId>
             <artifactId>iamshield-quarkus-server-app</artifactId>
@@ -46,6 +47,33 @@
             <type>zip</type>
         </dependency>
     </dependencies>
+=======
+    <dependency>
+        <groupId>org.iamshield</groupId>
+        <artifactId>iamshield-quarkus-server-app</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.iamshield</groupId>
+        <artifactId>iamshield-quarkus-server-deployment</artifactId>
+        <version>${project.version}</version>
+    </dependency>
+    <dependency>
+        <groupId>org.iamshield</groupId>
+        <artifactId>iamshield-client-cli-dist</artifactId>
+        <type>zip</type>
+    </dependency>
+    
+    <!-- QUARKUS RUNTIME -->
+    <dependency>
+        <groupId>org.iamshield</groupId>
+        <artifactId>iamshield-quarkus-server</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+    </dependency>
+    </dependencies>
+    
+>>>>>>> master
 
     <build>
         <finalName>${dist.archive.file}</finalName>

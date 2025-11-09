@@ -16,6 +16,12 @@
   -->
 <server-provisioning xmlns="urn:wildfly:server-provisioning:1.2" extract-schemas="true" copy-module-artifacts="true">
     <feature-packs>
+<<<<<<< HEAD
         <feature-pack groupId="org.keycloak" artifactId="keycloak-server-feature-pack" version="${project.version}"/>
     </feature-packs>
 </server-provisioning>
+=======
+        <feature-pack groupId="org.iamshield" artifactId="iamshield-server-feature-pack" version="${project.version}"/>
+    </feature-packs>
+</server-provisioning>
+>>>>>>> master
