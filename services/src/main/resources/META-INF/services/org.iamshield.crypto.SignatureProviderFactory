@@ -1,0 +1,14 @@
+org.iamshield.crypto.RS256SignatureProviderFactory
+org.iamshield.crypto.RS384SignatureProviderFactory
+org.iamshield.crypto.RS512SignatureProviderFactory
+org.iamshield.crypto.HS256SignatureProviderFactory
+org.iamshield.crypto.HS384SignatureProviderFactory
+org.iamshield.crypto.HS512SignatureProviderFactory
+org.iamshield.crypto.ES256SignatureProviderFactory
+org.iamshield.crypto.ES384SignatureProviderFactory
+org.iamshield.crypto.ES512SignatureProviderFactory
+org.iamshield.crypto.PS256SignatureProviderFactory
+org.iamshield.crypto.PS384SignatureProviderFactory
+org.iamshield.crypto.PS512SignatureProviderFactory
+org.iamshield.crypto.EdDSASignatureProviderFactory
+

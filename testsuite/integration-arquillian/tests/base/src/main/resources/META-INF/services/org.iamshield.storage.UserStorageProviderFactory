@@ -1,0 +1,3 @@
+org.iamshield.testsuite.federation.DummyUserFederationProviderFactory
+org.iamshield.testsuite.federation.FailingUserStorageProviderFactory
+

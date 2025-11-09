@@ -1,0 +1,48 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: iamshield-postgres
+    environment:
+      POSTGRES_DB: iamshield
+      POSTGRES_USER: iamshield
+      POSTGRES_PASSWORD: iamshield
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  iamshield:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: iamshield
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+      - "8443:8443"
+      - "8787:8787"
+    environment:
+      # Bootstrap admin user for first login
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+
+      # Database configuration (Postgres example)
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/iamshield
+      KC_DB_USERNAME: iamshield
+      KC_DB_PASSWORD: iamshield
+
+      # In dev we allow HTTP for simplicity. For prod use `start` and configure hostname/HTTPS
+      KC_HTTP_ENABLED: "true"
+      KC_LOG_LEVEL: info
+    command: ["start-dev", "--http-enabled=true", "--hostname=localhost"]
+
+volumes:
+  db_data:
+
+

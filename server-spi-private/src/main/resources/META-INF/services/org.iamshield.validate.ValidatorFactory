@@ -1,0 +1,12 @@
+org.iamshield.validate.validators.LengthValidator
+org.iamshield.validate.validators.NotEmptyValidator
+org.iamshield.validate.validators.UriValidator
+org.iamshield.validate.validators.EmailValidator
+org.iamshield.validate.validators.NotBlankValidator
+org.iamshield.validate.validators.PatternValidator
+org.iamshield.validate.validators.DoubleValidator
+org.iamshield.validate.validators.IntegerValidator
+org.iamshield.validate.validators.LocalDateValidator
+org.iamshield.validate.validators.OptionsValidator
+org.iamshield.validate.validators.IsoDateValidator
+

@@ -1,0 +1,30 @@
+#
+# Copyright 2022 Red Hat, Inc. and/or its affiliates
+# and other contributors as indicated by the @author tags.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+org.iamshield.models.cache.CacheUserProviderSpi
+org.iamshield.models.cache.CacheRealmProviderSpi
+org.iamshield.models.cache.CachePublicKeyProviderSpi
+org.iamshield.models.cache.CacheCrlProviderSpi
+org.iamshield.models.dblock.DBLockSpi
+org.iamshield.storage.client.ClientStorageProviderSpi
+org.iamshield.storage.group.GroupStorageProviderSpi
+org.iamshield.storage.clientscope.ClientScopeStorageProviderSpi
+org.iamshield.models.session.UserSessionPersisterSpi
+org.iamshield.models.session.RevokedTokenPersisterSpi
+org.iamshield.cluster.ClusterSpi
+org.iamshield.models.workflow.WorkflowStateSpi
+

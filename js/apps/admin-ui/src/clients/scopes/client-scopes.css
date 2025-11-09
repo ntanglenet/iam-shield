@@ -1,0 +1,7 @@
+.iamshield__client-scopes-add__add-dropdown {
+  margin-right: var(--pf-v5-global--spacer--md);
+}
+
+.kc-protocolType-select {
+  max-width: 25%;
+}

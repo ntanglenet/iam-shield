@@ -1,0 +1,17 @@
+.iamshield__user-federation__dropdown {
+  margin-top: var(--pf-v5-global--spacer--lg);
+}
+
+.iamshield-admin--user-federation__gallery-item {
+  display: contents;
+}
+
+.iamshield__user-federation__assign-role {
+  display: flex;
+  flex-direction: row;
+  align-items: right;
+}
+
+.iamshield__user-federation__assign-role-btn {
+  margin-left: 10px;
+}

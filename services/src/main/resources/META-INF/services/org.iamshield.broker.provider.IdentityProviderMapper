@@ -1,0 +1,44 @@
+#
+# Copyright 2016 Red Hat, Inc. and/or its affiliates
+# and other contributors as indicated by the @author tags.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+org.iamshield.broker.provider.HardcodedGroupMapper
+org.iamshield.broker.provider.HardcodedRoleMapper
+org.iamshield.broker.provider.HardcodedAttributeMapper
+org.iamshield.broker.provider.HardcodedUserSessionAttributeMapper
+org.iamshield.broker.oidc.mappers.ClaimToRoleMapper
+org.iamshield.broker.oidc.mappers.AdvancedClaimToRoleMapper
+org.iamshield.broker.oidc.mappers.AdvancedClaimToGroupMapper
+org.iamshield.broker.oidc.mappers.ClaimToUserSessionNoteMapper
+org.iamshield.broker.oidc.mappers.ExternalIAMShieldRoleToRoleMapper
+org.iamshield.broker.oidc.mappers.UserAttributeMapper
+org.iamshield.broker.oidc.mappers.UsernameTemplateMapper
+org.iamshield.broker.saml.mappers.AdvancedAttributeToRoleMapper
+org.iamshield.broker.saml.mappers.AdvancedAttributeToGroupMapper
+org.iamshield.broker.saml.mappers.AttributeToRoleMapper
+org.iamshield.broker.saml.mappers.UserAttributeMapper
+org.iamshield.broker.saml.mappers.XPathAttributeMapper
+org.iamshield.broker.saml.mappers.UsernameTemplateMapper
+org.iamshield.social.facebook.FacebookUserAttributeMapper
+org.iamshield.social.github.GitHubUserAttributeMapper
+org.iamshield.social.paypal.PayPalUserAttributeMapper
+org.iamshield.social.google.GoogleUserAttributeMapper
+org.iamshield.social.linkedin.LinkedInUserAttributeMapper
+org.iamshield.social.stackoverflow.StackoverflowUserAttributeMapper
+org.iamshield.social.microsoft.MicrosoftUserAttributeMapper
+org.iamshield.social.instagram.InstagramUserAttributeMapper
+org.iamshield.social.openshift.OpenshiftV4AttributeMapper
+

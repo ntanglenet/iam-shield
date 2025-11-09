@@ -1,0 +1,3 @@
+org.iamshield.infinispan.compatibility.CachingEmbeddedMetadataProvider
+org.iamshield.infinispan.compatibility.CachingRemoteMetadataProvider
+org.iamshield.jgroups.certificates.JGroupsCertificatesMetadataProvider

@@ -1,0 +1,7 @@
+org.iamshield.authentication.actiontoken.resetcred.ResetCredentialsActionTokenHandler
+org.iamshield.authentication.actiontoken.execactions.ExecuteActionsActionTokenHandler
+org.iamshield.authentication.actiontoken.verifyemail.VerifyEmailActionTokenHandler
+org.iamshield.authentication.actiontoken.idpverifyemail.IdpVerifyAccountLinkActionTokenHandler
+org.iamshield.authentication.actiontoken.updateemail.UpdateEmailActionTokenHandler
+org.iamshield.authentication.actiontoken.inviteorg.InviteOrgActionTokenHandler
+

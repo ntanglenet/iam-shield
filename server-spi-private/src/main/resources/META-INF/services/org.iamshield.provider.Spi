@@ -1,0 +1,113 @@
+#
+# Copyright 2016 Red Hat, Inc. and/or its affiliates
+# and other contributors as indicated by the @author tags.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+
+org.iamshield.client.clienttype.ClientTypeManagerSpi
+org.iamshield.client.clienttype.ClientTypeSpi
+org.iamshield.component.ComponentFactorySpi
+org.iamshield.provider.ExceptionConverterSpi
+org.iamshield.models.ClientSpi
+org.iamshield.models.ClientScopeSpi
+org.iamshield.models.GroupSpi
+org.iamshield.models.IdentityProviderStorageSpi
+org.iamshield.models.RealmSpi
+org.iamshield.models.RoleSpi
+org.iamshield.models.DeploymentStateSpi
+org.iamshield.models.OAuth2DeviceUserCodeSpi
+org.iamshield.models.SingleUseObjectSpi
+org.iamshield.models.UserSessionSpi
+org.iamshield.models.UserLoginFailureSpi
+org.iamshield.models.UserSpi
+org.iamshield.migration.MigrationSpi
+org.iamshield.events.EventListenerSpi
+org.iamshield.events.EventStoreSpi
+org.iamshield.exportimport.ExportSpi
+org.iamshield.exportimport.ImportSpi
+org.iamshield.timer.TimerSpi
+org.iamshield.scripting.ScriptingSpi
+org.iamshield.services.managers.BruteForceProtectorSpi
+org.iamshield.services.resource.AccountResourceSpi
+org.iamshield.services.resource.RealmResourceSPI
+org.iamshield.services.ui.extend.UiPageSpi
+org.iamshield.services.ui.extend.UiTabSpi
+org.iamshield.sessions.AuthenticationSessionSpi
+org.iamshield.sessions.StickySessionEncoderSpi
+org.iamshield.protocol.ClientInstallationSpi
+org.iamshield.protocol.LoginProtocolSpi
+org.iamshield.protocol.ProtocolMapperSpi
+org.iamshield.broker.provider.IdentityProviderSpi
+org.iamshield.broker.provider.IdentityProviderMapperSpi
+org.iamshield.broker.social.SocialProviderSpi
+org.iamshield.forms.login.LoginFormsSpi
+org.iamshield.email.EmailSenderSpi
+org.iamshield.email.EmailTemplateSpi
+org.iamshield.executors.ExecutorsSpi
+org.iamshield.theme.ThemeSpi
+org.iamshield.theme.ThemeManagerSpi
+org.iamshield.tracing.TracingSpi
+org.iamshield.truststore.TruststoreSpi
+org.iamshield.connections.httpclient.HttpClientSpi
+org.iamshield.authentication.AuthenticatorSpi
+org.iamshield.authentication.ClientAuthenticatorSpi
+org.iamshield.authentication.RequiredActionSpi
+org.iamshield.authentication.FormAuthenticatorSpi
+org.iamshield.authentication.FormActionSpi
+org.iamshield.authentication.otp.OTPApplicationSpi
+org.iamshield.authorization.policy.provider.PolicySpi
+org.iamshield.authorization.store.StoreFactorySpi
+org.iamshield.authorization.AuthorizationSpi
+org.iamshield.deployment.DeployedConfigurationsSpi
+org.iamshield.models.cache.authorization.CachedStoreFactorySpi
+org.iamshield.protocol.oidc.TokenExchangeSpi
+org.iamshield.protocol.oidc.TokenIntrospectionSpi
+org.iamshield.protocol.oidc.grants.OAuth2GrantTypeSpi
+org.iamshield.protocol.saml.ArtifactResolverSpi
+org.iamshield.policy.PasswordPolicySpi
+org.iamshield.policy.PasswordPolicyManagerSpi
+org.iamshield.transaction.TransactionManagerLookupSpi
+org.iamshield.credential.hash.PasswordHashSpi
+org.iamshield.credential.CredentialSpi
+org.iamshield.keys.PublicKeyStorageSpi
+org.iamshield.crl.CrlStorageSpi
+org.iamshield.keys.KeySpi
+org.iamshield.storage.DatastoreSpi
+org.iamshield.storage.role.RoleStorageProviderSpi
+org.iamshield.crypto.SignatureSpi
+org.iamshield.crypto.ClientSignatureVerifierSpi
+org.iamshield.crypto.HashSpi
+org.iamshield.vault.VaultSpi
+org.iamshield.crypto.CekManagementSpi
+org.iamshield.crypto.ContentEncryptionSpi
+org.iamshield.validation.ClientValidationSPI
+org.iamshield.validate.ValidatorSPI
+org.iamshield.headers.SecurityHeadersSpi
+org.iamshield.services.clientpolicy.condition.ClientPolicyConditionSpi
+org.iamshield.services.clientpolicy.executor.ClientPolicyExecutorSpi
+org.iamshield.services.clientpolicy.ClientPolicyManagerSpi
+org.iamshield.services.cors.CorsSpi
+org.iamshield.userprofile.UserProfileSpi
+org.iamshield.device.DeviceRepresentationSpi
+org.iamshield.health.LoadBalancerCheckSpi
+org.iamshield.cookie.CookieSpi
+org.iamshield.organization.OrganizationSpi
+org.iamshield.securityprofile.SecurityProfileSpi
+org.iamshield.logging.MappedDiagnosticContextSpi
+org.iamshield.models.workflow.WorkflowStepSpi
+org.iamshield.models.workflow.WorkflowSpi
+org.iamshield.models.workflow.WorkflowConditionSpi
+org.iamshield.protocol.oidc.rar.AuthorizationDetailsProcessorSpi
+org.iamshield.cache.AlternativeLookupSPI
+

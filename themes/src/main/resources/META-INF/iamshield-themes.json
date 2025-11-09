@@ -1,0 +1,12 @@
+{
+    "themes": [{
+        "name" : "base",
+        "types": [ "admin", "account", "login", "email" ]
+    }, {
+        "name" : "iamshield",
+        "types": [ "login", "common", "email", "welcome" ]
+    }, {
+        "name" : "iamshield.v2",
+        "types": [ "login" ]
+    }]
+}

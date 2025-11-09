@@ -1,0 +1,10 @@
+org.iamshield.protocol.oidc.grants.AuthorizationCodeGrantTypeFactory
+org.iamshield.protocol.oidc.grants.ClientCredentialsGrantTypeFactory
+org.iamshield.protocol.oidc.grants.PermissionGrantTypeFactory
+org.iamshield.protocol.oidc.grants.RefreshTokenGrantTypeFactory
+org.iamshield.protocol.oidc.grants.ResourceOwnerPasswordCredentialsGrantTypeFactory
+org.iamshield.protocol.oidc.grants.TokenExchangeGrantTypeFactory
+org.iamshield.protocol.oidc.grants.ciba.CibaGrantTypeFactory
+org.iamshield.protocol.oidc.grants.device.DeviceGrantTypeFactory
+org.iamshield.protocol.oidc.grants.PreAuthorizedCodeGrantTypeFactory
+

@@ -1,0 +1,71 @@
+<#import "/templates/guide.adoc" as tmpl>
+<#import "/templates/links.adoc" as links>
+<#import "/templates/profile.adoc" as profile>
+
+<@tmpl.guide
+title="High availability overview"
+summary="Explore the different {project_name} high-availability architectures" >
+
+{project_name} supports different high-availability architectures, allowing system administrators to pick the deployment type most suitable
+for their needs. Ease of deployment, cost and fault-tolerance guarantees are important considerations when determining the correct architecture
+for your deployments.
+
+== Architectures
+
+This document describes two architectures to deploy {project_name}: Single-cluster deployments and multi-cluster deployments.
+
+=== Single-cluster deployments
+
+Deploy {project_name} in a single cluster, optionally across multiple availability-zones in the same region, using <@links.ha id="single-cluster-introduction" />.
+
+Advantages::
+* No external dependencies
+
+<@profile.ifProduct>
+
+* Deployment in a single {kubernetes} cluster
+
+</@profile.ifProduct>
+
+<@profile.ifCommunity>
+
+* Deployment in a single {kubernetes} cluster or a set of virtual machines with transparent networking
+
+</@profile.ifCommunity>
+
+* Tolerate availability-zone failures if deployed to multiple availability zones
+
+Disadvantages::
+* {kubernetes} cluster is a single point of failure:
+** Control-plane failures could impact all {project_name} pods
+
+=== Multi-cluster deployments
+
+Connect two {project_name} clusters deployed for example in different {kubernetes} clusters in two availability zones to increase availability using <@links.ha id="multi-cluster-introduction" />.
+
+Advantages::
+* Tolerate availability-zone failure
+* Tolerate {kubernetes} cluster failure
+* Bridge two networks that do not offer transparent networking
+* Regulatory compliance when distinct deployments are required
+
+Disadvantages::
+* Complexity:
+** External load-balancer required
+** Separate {jdgserver_name} cluster required on each site
+* Cost:
+** Additional load-balancer required
+** Additional compute is required for external {jdgserver_name} clusters
+** Two {kubernetes} control-planes must be provisioned
+* Not supported with three or more availability zones
+
+=== Next Steps
+
+To learn more about the different high-availability architectures and their supported configurations, please consult the individual {sections}.
+
+<@profile.ifCommunity>
+* <@links.ha id="single-cluster-introduction" />
+* <@links.ha id="multi-cluster-introduction" />
+</@profile.ifCommunity>
+
+</@tmpl.guide>

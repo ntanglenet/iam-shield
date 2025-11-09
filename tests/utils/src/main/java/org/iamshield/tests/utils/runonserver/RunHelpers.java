@@ -1,0 +1,74 @@
+package org.iamshield.tests.utils.runonserver;
+
+import org.iamshield.credential.CredentialModel;
+import org.iamshield.models.RealmModel;
+import org.iamshield.models.UserModel;
+import org.iamshield.models.utils.ModelToRepresentation;
+import org.iamshield.representations.idm.ComponentRepresentation;
+import org.iamshield.representations.idm.CredentialRepresentation;
+import org.iamshield.representations.idm.RealmRepresentation;
+import org.iamshield.testframework.remote.providers.runonserver.FetchOnServer;
+import org.iamshield.testframework.remote.providers.runonserver.FetchOnServerWrapper;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * Created by st on 26.01.17.
+ */
+public class RunHelpers {
+
+    public static FetchOnServerWrapper<RealmRepresentation> internalRealm() {
+        return new FetchOnServerWrapper() {
+
+            @Override
+            public FetchOnServer getRunOnServer() {
+                return (FetchOnServer) session -> ModelToRepresentation.toRepresentation(session, session.getContext().getRealm(), true);
+            }
+
+            @Override
+            public Class<RealmRepresentation> getResultClass() {
+                return RealmRepresentation.class;
+            }
+
+        };
+    }
+
+    public static FetchOnServerWrapper<ComponentRepresentation> internalComponent(String componentId) {
+        return new FetchOnServerWrapper() {
+
+            @Override
+            public FetchOnServer getRunOnServer() {
+                return (FetchOnServer) session -> ModelToRepresentation.toRepresentation(session, session.getContext().getRealm().getComponent(componentId), true);
+            }
+
+            @Override
+            public Class<ComponentRepresentation> getResultClass() {
+                return ComponentRepresentation.class;
+            }
+
+        };
+    }
+
+    public static FetchOnServerWrapper<CredentialModel> fetchCredentials(String username) {
+        return new FetchOnServerWrapper() {
+
+            @Override
+            public FetchOnServer getRunOnServer() {
+                return (FetchOnServer) session -> {
+                    RealmModel realm = session.getContext().getRealm();
+                    UserModel user = session.users().getUserByUsername(realm, username);
+                    List<CredentialModel> storedCredentialsByType = user.credentialManager().getStoredCredentialsByTypeStream(CredentialRepresentation.PASSWORD)
+                            .collect(Collectors.toList());
+                    return storedCredentialsByType.get(0);
+                };
+            }
+
+            @Override
+            public Class getResultClass() {
+                return CredentialModel.class;
+            }
+        };
+    }
+
+}

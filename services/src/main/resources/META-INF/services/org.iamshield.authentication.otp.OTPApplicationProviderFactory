@@ -1,0 +1,3 @@
+org.iamshield.authentication.otp.GoogleAuthenticatorProvider
+org.iamshield.authentication.otp.FreeOTPProvider
+org.iamshield.authentication.otp.MicrosoftAuthenticatorOTPProvider

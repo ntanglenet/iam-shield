@@ -1,0 +1,178 @@
+/*
+ * Copyright 2022 Red Hat, Inc. and/or its affiliates
+ * and other contributors as indicated by the @author tags.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package org.iamshield.it.cli.dist;
+
+import java.nio.file.Path;
+
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
+import org.iamshield.crypto.fips.IAMShieldFipsSecurityProvider;
+import org.iamshield.it.junit5.extension.CLIResult;
+import org.iamshield.it.junit5.extension.DistributionTest;
+import org.iamshield.it.junit5.extension.RawDistOnly;
+import org.iamshield.it.utils.IAMShieldDistribution;
+import org.iamshield.it.utils.RawIAMShieldDistribution;
+
+import io.quarkus.test.junit.main.Launch;
+
+@DistributionTest(keepAlive = true, defaultOptions = { "--db=dev-file", "--features=fips", "--http-enabled=true", "--hostname-strict=false", "--log-level=org.iamshield.common.crypto.CryptoIntegration:trace" })
+@RawDistOnly(reason = "Containers are immutable")
+@Tag(DistributionTest.SLOW)
+public class FipsDistTest {
+
+    private static final String BCFIPS_VERSION = "BCFIPS version 2.0";
+
+    @Test
+    void testFipsNonApprovedMode(IAMShieldDistribution dist) {
+        runOnFipsEnabledDistribution(dist, () -> {
+            CLIResult cliResult = dist.run("start");
+            cliResult.assertStarted();
+            // Not shown as FIPS is not a preview anymore
+            cliResult.assertMessageWasShownExactlyNumberOfTimes("Preview features enabled: fips:v1", 0);
+            cliResult.assertMessage("Java security providers: [ \n"
+                    + " KC(" + BCFIPS_VERSION + ", FIPS-JVM: " + IAMShieldFipsSecurityProvider.isSystemFipsEnabled() + ") version 1.0 - class org.iamshield.crypto.fips.IAMShieldFipsSecurityProvider");
+        });
+    }
+
+    @Test
+    void testFipsApprovedMode(IAMShieldDistribution dist) {
+        runOnFipsEnabledDistribution(dist, () -> {
+            dist.setEnvVar("KC_BOOTSTRAP_ADMIN_USERNAME", "admin");
+            dist.setEnvVar("KC_BOOTSTRAP_ADMIN_PASSWORD", "admin");
+
+            CLIResult cliResult = dist.run("start", "--fips-mode=strict");
+            cliResult.assertMessage("password must be at least 112 bits");
+            cliResult.assertMessage("Java security providers: [ \n"
+                    + " KC(" + BCFIPS_VERSION + " Approved Mode, FIPS-JVM: " + IAMShieldFipsSecurityProvider.isSystemFipsEnabled() + ") version 1.0 - class org.iamshield.crypto.fips.IAMShieldFipsSecurityProvider");
+
+            dist.setEnvVar("KC_BOOTSTRAP_ADMIN_PASSWORD", "adminadminadmin");
+            cliResult = dist.run("start", "--fips-mode=strict");
+            cliResult.assertStarted();
+            cliResult.assertMessage("Created temporary admin user with username admin");
+        });
+    }
+
+    @Test
+    @Launch({ "start", "--fips-mode=non-strict" })
+    void failStartDueToMissingFipsDependencies(CLIResult cliResult) {
+        cliResult.assertError("Failed to configure FIPS. Make sure you have added the Bouncy Castle FIPS dependencies to the 'providers' directory.");
+    }
+
+    @Test
+    void testUnsupportedHttpsJksKeyStoreInStrictMode(IAMShieldDistribution dist) {
+        runOnFipsEnabledDistribution(dist, () -> {
+            dist.copyOrReplaceFileFromClasspath("/server.keystore", Path.of("conf", "server.keystore"));
+            CLIResult cliResult = dist.run("start", "--fips-mode=strict");
+            cliResult.assertMessage("ERROR: java.lang.IllegalArgumentException: malformed sequence");
+        });
+    }
+
+    @Test
+    void testHttpsBcfksKeyStoreInStrictMode(IAMShieldDistribution dist) {
+        runOnFipsEnabledDistribution(dist, () -> {
+            dist.copyOrReplaceFileFromClasspath("/server.keystore.bcfks", Path.of("conf", "server.keystore"));
+            CLIResult cliResult = dist.run("start", "--fips-mode=strict", "--https-key-store-password=passwordpassword");
+            cliResult.assertStarted();
+        });
+    }
+
+    @Test
+    void testHttpsBcfksTrustStoreInStrictMode(IAMShieldDistribution dist) {
+        runOnFipsEnabledDistribution(dist, () -> {
+            dist.copyOrReplaceFileFromClasspath("/server.keystore.bcfks", Path.of("conf", "server.keystore"));
+
+            RawIAMShieldDistribution rawDist = dist.unwrap(RawIAMShieldDistribution.class);
+            Path truststorePath = rawDist.getDistPath().resolve("conf").resolve("server.keystore").toAbsolutePath();
+
+            // https-trust-store-type should be automatically set to bcfks in fips-mode=strict
+            CLIResult cliResult = dist.run("--verbose", "start", "--fips-mode=strict", "--https-key-store-password=passwordpassword",
+                    "--https-trust-store-file=" + truststorePath, "--https-trust-store-password=passwordpassword");
+            cliResult.assertStarted();
+        });
+    }
+
+    @Test
+    void testUnencryptedPkcs12TrustStoreInStrictMode(IAMShieldDistribution dist) {
+        runOnFipsEnabledDistribution(dist, () -> {
+            String truststoreName = "keycloak-truststore.p12";
+            dist.copyOrReplaceFileFromClasspath("/" + truststoreName, Path.of("conf", truststoreName));
+
+            RawIAMShieldDistribution rawDist = dist.unwrap(RawIAMShieldDistribution.class);
+            Path truststorePath = rawDist.getDistPath().resolve("conf").resolve(truststoreName).toAbsolutePath();
+
+            CLIResult cliResult = dist.run("--verbose", "start", "--fips-mode=strict", "--truststore-paths=" + truststorePath);
+            cliResult.assertStarted();
+        });
+    }
+
+    @Test
+    void testUnsupportedHttpsPkcs12KeyStoreInStrictMode(IAMShieldDistribution dist) {
+        runOnFipsEnabledDistribution(dist, () -> {
+            dist.copyOrReplaceFileFromClasspath("/server.keystore.pkcs12", Path.of("conf", "server.keystore"));
+            CLIResult cliResult = dist.run("start", "--fips-mode=strict", "--https-key-store-password=passwordpassword");
+            cliResult.assertMessage("ERROR: java.lang.IllegalArgumentException: malformed sequence");
+        });
+    }
+
+    @Test
+    void testHttpsPkcs12KeyStoreInNonApprovedMode(IAMShieldDistribution dist) {
+        runOnFipsEnabledDistribution(dist, () -> {
+            dist.copyOrReplaceFileFromClasspath("/server.keystore.pkcs12", Path.of("conf", "server.keystore"));
+            CLIResult cliResult = dist.run("start", "--fips-mode=non-strict", "--https-key-store-password=passwordpassword");
+            cliResult.assertStarted();
+        });
+    }
+
+    @Test
+    void testHttpsPkcs12TrustStoreInNonApprovedMode(IAMShieldDistribution dist) {
+        runOnFipsEnabledDistribution(dist, () -> {
+            dist.copyOrReplaceFileFromClasspath("/server.keystore.pkcs12", Path.of("conf", "server.keystore"));
+
+            RawIAMShieldDistribution rawDist = dist.unwrap(RawIAMShieldDistribution.class);
+            Path truststorePath = rawDist.getDistPath().resolve("conf").resolve("server.keystore").toAbsolutePath();
+
+            CLIResult cliResult = dist.run("--verbose", "start", "--fips-mode=non-strict", "--https-key-store-password=passwordpassword",
+                    "--https-trust-store-file=" + truststorePath, "--https-trust-store-password=passwordpassword");
+            cliResult.assertMessage("Unable to determine 'https-trust-store-type' automatically. Adjust the file extension or specify the property.");
+            dist.stop();
+
+            dist.copyOrReplaceFileFromClasspath("/server.keystore.pkcs12", Path.of("conf", "server.p12"));
+
+            rawDist = dist.unwrap(RawIAMShieldDistribution.class);
+            truststorePath = rawDist.getDistPath().resolve("conf").resolve("server.p12").toAbsolutePath();
+
+            cliResult = dist.run("--verbose", "start", "--fips-mode=non-strict", "--https-key-store-password=passwordpassword",
+                    "--https-trust-store-file=" + truststorePath, "--https-trust-store-password=passwordpassword");
+            cliResult.assertStarted();
+        });
+    }
+
+    private void runOnFipsEnabledDistribution(IAMShieldDistribution dist, Runnable runnable) {
+        installBcFips(dist);
+        runnable.run();
+    }
+
+    private void installBcFips(IAMShieldDistribution dist) {
+        RawIAMShieldDistribution rawDist = dist.unwrap(RawIAMShieldDistribution.class);
+        rawDist.copyProvider("org.bouncycastle", "bc-fips");
+        rawDist.copyProvider("org.bouncycastle", "bctls-fips");
+        rawDist.copyProvider("org.bouncycastle", "bcpkix-fips");
+        rawDist.copyProvider("org.bouncycastle", "bcutil-fips");
+    }
+
+}

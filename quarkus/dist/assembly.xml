@@ -1,0 +1,68 @@
+<!--
+  ~ Copyright 2016 Red Hat, Inc. and/or its affiliates
+  ~ and other contributors as indicated by the @author tags.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+
+<assembly>
+    <id>server-dist</id>
+
+    <formats>
+        <format>zip</format>
+        <format>tar.gz</format>
+    </formats>
+
+    <includeBaseDirectory>true</includeBaseDirectory>
+    <baseDirectory>${dist.archive.dir}</baseDirectory>
+
+    <fileSets>
+        <!-- COPY ENTIRE QUARKUS SERVER TARGET DIRECTORY -->
+        <fileSet>
+            <directory>../server/target</directory>
+            <outputDirectory>/</outputDirectory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <excludes>
+                <exclude>**/bin/**</exclude>
+                <exclude>**/test/**</exclude>
+                <exclude>**/surefire/**</exclude>
+                <exclude>**/classes/**</exclude>
+                <exclude>**/test-classes/**</exclude>
+                <exclude>**/generated-test-sources/**</exclude>
+                <exclude>**/maven-status/**</exclude>
+            </excludes>
+        </fileSet>
+        
+        <!-- WHITE-LABELED BIN SCRIPTS (OVERWRITE QUARKUS BIN) -->
+        <fileSet>
+            <directory>src/main/content/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+        
+        <!-- CLIENT TOOLS BIN -->
+        <fileSet>
+            <directory>target/iamshield-client-tools/bin</directory>
+            <outputDirectory>bin</outputDirectory>
+            <includes>
+                <include>*</include>
+            </includes>
+            <fileMode>0755</fileMode>
+        </fileSet>
+    </fileSets>
+</assembly>

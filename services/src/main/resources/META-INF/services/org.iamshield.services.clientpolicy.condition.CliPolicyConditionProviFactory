@@ -1,0 +1,13 @@
+org.iamshield.services.clientpolicy.condition.CliUpdaterContextConditionFactory
+org.iamshield.services.clientpolicy.condition.CliRolesConditionFactory
+org.iamshield.services.clientpolicy.condition.CliScopesConditionFactory
+org.iamshield.services.clientpolicy.condition.CliAccessTypeConditionFactory
+org.iamshield.services.clientpolicy.condition.CliUpdaterSourceHostsConditionFactory
+org.iamshield.services.clientpolicy.condition.CliUpdaterSourceGroupsConditionFactory
+org.iamshield.services.clientpolicy.condition.CliUpdaterSourceRolesConditionFactory
+org.iamshield.services.clientpolicy.condition.AnyCliConditionFactory
+org.iamshield.services.clientpolicy.condition.CliProtocolConditionFactory
+org.iamshield.services.clientpolicy.condition.CliAttributesConditionFactory
+org.iamshield.services.clientpolicy.condition.AcrConditionFactory
+org.iamshield.services.clientpolicy.condition.GrantTypeConditionFactory
+
